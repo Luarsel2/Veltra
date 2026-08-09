@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${nombreRestaurante}">Danny's Panqueques</title>
+    
+    <!-- Ícono de la pestaña de la ventana del navegador (Favicon) -->
+    <link rel="icon" type="image/png" href="/logodannysss.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#fffbeb] text-[#1f2937] font-sans">
+
+    <!-- Barra Superior / Navbar -->
+    <nav class="bg-[#dc2626] text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
+            
+            <!-- Logo y Nombre -->
+            <div class="flex items-center space-x-4">
+                <img src="/logodannysss.png" alt="Danny's Panqueques Logo" class="h-20 w-20 object-contain bg-white p-1 rounded-full border-2 border-[#facc15] shadow-lg transform hover:scale-105 transition duration-300">
+                <span class="text-3xl font-black text-[#fde047] tracking-wide" th:text="${nombreRestaurante}">Danny's Panqueques</span>
+            </div>
+
+            <!-- Botón del menú a la derecha -->
+            <a href="#menu" class="bg-[#facc15] hover:bg-[#fde047] text-[#b91c1c] font-extrabold py-2 px-6 rounded-full transition duration-300 shadow-md">
+                Ver Menú
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- Encabezado / Hero -->
+    <header class="relative bg-cover h-[550px] flex items-center justify-center text-white" 
+            style="background-image: url('/restaurantelog.png'); background-position: center 50%;">
+        <div class="absolute inset-0 bg-[#7f1d1d] bg-opacity-30"></div>
+        <div class="relative z-10 text-center px-4">
+            <h1 class="text-5xl font-black mb-2 text-[#fde047] drop-shadow-md" th:text="${nombreRestaurante}">Danny's Panqueques</h1>
+            <p class="text-2xl font-medium text-white drop-shadow">¡Los pancakes más deliciosos y esponjosos!</p>
+        </div>
+    </header>
+
+    <!-- Sección de Menú -->
+    <section id="menu" class="max-w-6xl mx-auto py-16 px-4">
+        <h2 class="text-4xl font-extrabold text-center mb-12 text-[#dc2626] border-b-4 border-[#facc15] w-48 mx-auto pb-2">Nuestros Platillos</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div th:each="item : ${menu}" class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-[#fef08a] hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                <img th:src="${item.imagen}" th:alt="${item.nombre}" class="h-52 w-full object-cover">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-2xl font-bold text-[#dc2626]" th:text="${item.nombre}">Platillo</h3>
+                        <span class="bg-[#facc15] text-[#991b1b] text-lg font-black px-3 py-1 rounded-full" th:text="${item.precio}">Q0.00</span>
+                    </div>
+                    <p class="text-[#4b5563] font-medium" th:text="${item.descripcion}">Descripción del platillo...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ubicación -->
+    <section class="bg-[#dc2626] text-white py-16 px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-black mb-4 text-[#fde047]">¡Ven a Disfrutar!</h2>
+            <p class="mb-8 text-xl font-light">Encuéntranos fácilmente en Google Maps y ven por tus panqueques favoritos.</p>
+            <a href="https://maps.app.goo.gl/2SxW6go7bW3ZALRP9" target="_blank" class="inline-flex items-center bg-[#facc15] hover:bg-[#fde047] text-[#b91c1c] font-black text-lg py-4 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                Abrir Ubicación en Google Maps
+            </a>
+        </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="bg-[#111827] text-white py-6 text-center text-sm border-t-4 border-[#facc15]">
+        <p>&copy; 2026 <span class="text-[#facc15] font-bold" th:text="${nombreRestaurante}">Danny's Panqueques</span>. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
