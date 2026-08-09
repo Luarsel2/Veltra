@@ -107,7 +107,6 @@
     object-fit: contain;
     filter: drop-shadow(0 2px 10px rgba(111, 141, 255, 0.4));
     transition: transform 0.3s ease, filter 0.3s ease;
-    /* MAGIA CSS: Bajar visualmente el logo para alinearlo con el centro óptico de la fuente */
     transform: translateY(3px); 
   }
   
@@ -125,7 +124,6 @@
     color: var(--text-hi);
   }
 
-  /* Isotipo Cuadrado/Vertical (Footer o Mockups) */
   .logo-icon-mark {
     width: 28px;
     height: 28px;
@@ -133,7 +131,6 @@
     filter: drop-shadow(0 2px 6px rgba(111, 141, 255, 0.3));
   }
 
-  /* Logo Gigante para el cierre de página */
   .big-brand-logo {
     height: 150px;
     width: auto;
@@ -168,6 +165,7 @@
   }
   .btn-primary{ background:var(--accent-grad); color:#05070d; }
   .btn-primary:hover{ transform:translateY(-2px); filter:brightness(1.07); }
+  .btn-primary:disabled{ opacity:0.7; cursor:not-allowed; transform:none; filter:none; }
   .btn-ghost{ border-color:var(--line); color:var(--text-hi); background:var(--glass); }
   .btn-ghost:hover{ background:var(--glass-hover); border-color:rgba(255,255,255,0.18); }
 
@@ -187,12 +185,6 @@
   .hero h1{ font-size:clamp(2.2rem, 4.3vw, 3.5rem); margin:22px 0 22px; }
   .hero p.lead{ font-size:1.08rem; color:var(--text-lo); max-width:48ch; margin-bottom:34px; }
   .hero-actions{ display:flex; flex-wrap:wrap; gap:14px; }
-
-  .confirm-banner{
-    margin-top:22px; padding:13px 18px; border-radius:11px;
-    background:rgba(126,224,214,0.10); border:1px solid rgba(126,224,214,0.28);
-    color:var(--accent-2); font-size:0.9rem; font-weight:500;
-  }
 
   /* ---- visual firma: mockup de panel con animación ---- */
   .hero-visual{ position:relative; perspective:1200px; }
@@ -332,6 +324,22 @@
   .field textarea{ min-height:90px; resize:vertical; }
   .field input:focus, .field textarea:focus{ border-bottom-color:var(--accent-1); }
 
+  /* ---- Aviso de envío, dentro de la sección de contacto ---- */
+  .send-notice{
+    display:flex; align-items:center; gap:10px;
+    padding:13px 16px; border-radius:11px;
+    background:rgba(126,224,214,0.10); border:1px solid rgba(126,224,214,0.28);
+    color:var(--accent-2); font-size:0.9rem; font-weight:500;
+    margin-bottom:22px;
+    opacity:0; transform:translateY(-8px);
+    animation: notice-in .5s ease forwards;
+  }
+  .send-notice--err{
+    background:rgba(255,120,120,0.10); border-color:rgba(255,120,120,0.3); color:#ff9a9a;
+  }
+  @keyframes notice-in{ to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .send-notice{ animation:none; opacity:1; transform:none; } }
+
   /* ============ FOOTER ============ */
   footer{ padding:40px 0 48px; }
   footer .wrap{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:0.82rem; color:var(--text-faint); }
@@ -375,13 +383,6 @@
         <div class="hero-actions">
           <a href="#contacto" class="btn btn-primary">Cuéntanos tu proceso →</a>
           <a href="#proceso" class="btn btn-ghost">Ver cómo trabajamos</a>
-        </div>
-
-        <div class="confirm-banner" th:if="${mostrarConfirmacion}">
-          ✓ Recibimos tu mensaje. Te contactamos pronto.
-        </div>
-        <div class="confirm-banner" style="background:rgba(255,120,120,0.10); border-color:rgba(255,120,120,0.3); color:#ff9a9a;" th:if="${mostrarError}">
-          ⚠ Hubo un problema enviando tu mensaje. Intenta de nuevo en un momento.
         </div>
       </div>
 
@@ -592,21 +593,31 @@
           <dd>Guatemala, Guatemala</dd>
         </dl>
 
-        <form class="contact-form" th:action="@{/contacto}" method="post">
-          <div class="field">
-            <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" name="nombre" required>
+        <div>
+          <!-- Este aviso solo aparece justo aquí, y solo si venimos de un envío real del formulario -->
+          <div class="send-notice" th:if="${mostrarConfirmacion}">
+            ✓ Recibimos tu mensaje. Te contactamos pronto.
           </div>
-          <div class="field">
-            <label for="email">Correo</label>
-            <input type="email" id="email" name="email" required>
+          <div class="send-notice send-notice--err" th:if="${mostrarError}">
+            ⚠ Hubo un problema enviando tu mensaje. Intenta de nuevo en un momento.
           </div>
-          <div class="field">
-            <label for="mensaje">Cuéntanos sobre tu negocio</label>
-            <textarea id="mensaje" name="mensaje" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Enviar mensaje →</button>
-        </form>
+
+          <form class="contact-form" id="contactForm" th:action="@{/contacto}" method="post">
+            <div class="field">
+              <label for="nombre">Nombre</label>
+              <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="field">
+              <label for="email">Correo</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            <div class="field">
+              <label for="mensaje">Cuéntanos sobre tu negocio</label>
+              <textarea id="mensaje" name="mensaje" required></textarea>
+            </div>
+            <button type="submit" id="submitBtn" class="btn btn-primary" style="align-self:flex-start;">Enviar mensaje →</button>
+          </form>
+        </div>
       </div>
     </div>
   </section>
@@ -678,6 +689,26 @@
     });
     heroVisual.addEventListener('mouseleave', () => {
       mockCard.style.transform = 'rotateX(4deg) rotateY(-6deg)';
+    });
+  }
+
+  // Si venimos de enviar el formulario, limpiamos ?enviado=true / ?error=true
+  // de la URL para que al recargar no vuelva a aparecer el aviso.
+  if (window.location.search.includes('enviado') || window.location.search.includes('error')) {
+    const url = new URL(window.location);
+    url.searchParams.delete('enviado');
+    url.searchParams.delete('error');
+    window.history.replaceState({}, '', url);
+  }
+
+  // Feedback inmediato al enviar el formulario: deshabilita el botón
+  // y cambia el texto mientras el servidor procesa el envío.
+  const contactForm = document.getElementById('contactForm');
+  const submitBtn = document.getElementById('submitBtn');
+  if (contactForm && submitBtn){
+    contactForm.addEventListener('submit', () => {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
     });
   }
 </script>
