@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Veltra — Software a la medida para negocios pequeños</title>
+
+<!-- Favicon: usa el mismo logo que ya tienes subido -->
+<link rel="icon" type="image/png" th:href="@{/img/veltrafavicon.png}" href="../static/img/veltrafavicon.png">
+<link rel="apple-touch-icon" th:href="@{/img/veltrafavicon.png}" href="../static/img/veltrafavicon.png">
 <meta name="description" content="Veltra diseña software a la medida para pequeñas empresas: inventario, ventas y automatización de procesos, hecho por estudiantes de Ingeniería en Ciencias de la Computación de la UVG.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,7 +157,56 @@
     transition:filter .15s ease, transform .15s ease;
   }
   .nav-cta:hover{ filter:brightness(1.08); transform:translateY(-1px); }
-  @media (max-width:800px){ .nav-links > a:not(.nav-cta){ display:none; } }
+
+  /* ---- Menú móvil (hamburguesa) ---- */
+  .nav-toggle{
+    display:none;
+    width:40px; height:40px;
+    align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--line); border-radius:9px;
+    cursor:pointer;
+  }
+  .nav-toggle span{
+    display:block; width:18px; height:1.5px; background:var(--text-hi);
+    position:relative;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .nav-toggle span::before, .nav-toggle span::after{
+    content:""; position:absolute; left:0; width:18px; height:1.5px; background:var(--text-hi);
+    transition:transform .2s ease, top .2s ease;
+  }
+  .nav-toggle span::before{ top:-6px; }
+  .nav-toggle span::after{ top:6px; }
+  .nav-toggle.open span{ background:transparent; }
+  .nav-toggle.open span::before{ top:0; transform:rotate(45deg); }
+  .nav-toggle.open span::after{ top:0; transform:rotate(-45deg); }
+
+  .mobile-menu{
+    display:none;
+    position:fixed; top:74px; left:0; right:0; z-index:60;
+    background:rgba(6,9,18,0.97);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    padding:14px 22px 26px;
+    flex-direction:column; gap:4px;
+
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .32s ease, opacity .25s ease;
+  }
+  .mobile-menu.open{ max-height:340px; opacity:1; }
+  .mobile-menu a{
+    padding:14px 6px; font-size:1rem; color:var(--text-hi);
+    border-bottom:1px solid var(--line);
+  }
+  .mobile-menu a:last-child{ border-bottom:none; }
+  .mobile-menu .nav-cta{ text-align:center; margin-top:12px; }
+
+  @media (max-width:800px){
+    .nav-links > a:not(.nav-cta){ display:none; }
+    .nav-links .nav-cta{ display:none; }
+    .nav-toggle{ display:flex; }
+    .mobile-menu{ display:flex; }
+  }
 
   /* ============ BUTTONS ============ */
   .btn{
@@ -344,6 +397,45 @@
   footer{ padding:40px 0 48px; }
   footer .wrap{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:0.82rem; color:var(--text-faint); }
 
+  /* ============ BOTÓN FLOTANTE DE WHATSAPP ============ */
+  .whatsapp-float{
+    position:fixed;
+    right:22px; bottom:22px;
+    z-index:80;
+    width:58px; height:58px;
+    border-radius:50%;
+    background:#25D366;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 28px -6px rgba(37,211,102,0.55);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .whatsapp-float:hover{
+    transform:translateY(-3px) scale(1.05);
+    box-shadow:0 14px 34px -6px rgba(37,211,102,0.7);
+  }
+  .whatsapp-float svg{ width:28px; height:28px; }
+
+  /* Anillo de pulso sutil, para llamar la atención sin ser invasivo */
+  .whatsapp-float::before{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:50%;
+    background:#25D366;
+    opacity:0.55;
+    animation: wa-pulse 2.6s ease-out infinite;
+    z-index:-1;
+  }
+  @keyframes wa-pulse{
+    0%{ transform:scale(1); opacity:0.5; }
+    100%{ transform:scale(1.7); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){ .whatsapp-float::before{ animation:none; display:none; } }
+
+  @media (max-width:640px){
+    .whatsapp-float{ right:16px; bottom:16px; width:52px; height:52px; }
+    .whatsapp-float svg{ width:25px; height:25px; }
+  }
+
   /* ============ SCROLL REVEAL ============ */
   .reveal{ opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
   .reveal.is-visible{ opacity:1; transform:none; }
@@ -364,7 +456,16 @@
       <a href="#nosotros">Nosotros</a>
       <a href="#contacto" class="nav-cta">Hablemos</a>
     </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span>
+    </button>
   </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#servicios">Servicios</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#contacto" class="nav-cta">Hablemos</a>
+  </div>
 </header>
 
 <main id="top">
@@ -634,6 +735,12 @@
 
 </main>
 
+<!-- Botón flotante de WhatsApp: visible en todas las secciones -->
+<a href="https://web.whatsapp.com/send?phone=50230511180&text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20me%20gustar%C3%ADa%20saber%20m%C3%A1s%20sobre%20Veltra"
+   class="whatsapp-float" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="#ffffff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.51 2 12.04 2Zm5.8 14.02c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.1.11-1.78-.11-.41-.13-.94-.31-1.61-.6-2.84-1.22-4.69-4.08-4.83-4.27-.14-.19-1.16-1.54-1.16-2.94 0-1.4.73-2.08.99-2.37.26-.28.57-.35.76-.35h.55c.18 0 .41-.02.63.48.24.55.8 1.9.87 2.04.07.14.11.3.02.49-.09.19-.14.3-.28.46-.14.16-.29.36-.42.48-.14.13-.28.28-.12.55.16.28.72 1.19 1.55 1.93 1.06.95 1.96 1.24 2.24 1.38.28.14.44.12.6-.07.16-.19.7-.82.89-1.1.19-.28.37-.23.62-.14.26.09 1.63.77 1.91.91.28.14.47.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
+</a>
+
 <footer style="padding-top: 20px;">
   <div class="wrap" style="align-items: center;">
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -646,6 +753,28 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Menú móvil: abrir/cerrar con el botón hamburguesa
+  const navToggle = document.getElementById('navToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (navToggle && mobileMenu){
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      navToggle.classList.toggle('open', isOpen);
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      navToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+    });
+
+    // Cerrar el menú apenas tocan cualquier link de adentro
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Abrir menú');
+      });
+    });
+  }
 
   // Scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
