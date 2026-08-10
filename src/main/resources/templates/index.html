@@ -153,7 +153,56 @@
     transition:filter .15s ease, transform .15s ease;
   }
   .nav-cta:hover{ filter:brightness(1.08); transform:translateY(-1px); }
-  @media (max-width:800px){ .nav-links > a:not(.nav-cta){ display:none; } }
+
+  /* ---- Menú móvil (hamburguesa) ---- */
+  .nav-toggle{
+    display:none;
+    width:40px; height:40px;
+    align-items:center; justify-content:center;
+    background:transparent; border:1px solid var(--line); border-radius:9px;
+    cursor:pointer;
+  }
+  .nav-toggle span{
+    display:block; width:18px; height:1.5px; background:var(--text-hi);
+    position:relative;
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .nav-toggle span::before, .nav-toggle span::after{
+    content:""; position:absolute; left:0; width:18px; height:1.5px; background:var(--text-hi);
+    transition:transform .2s ease, top .2s ease;
+  }
+  .nav-toggle span::before{ top:-6px; }
+  .nav-toggle span::after{ top:6px; }
+  .nav-toggle.open span{ background:transparent; }
+  .nav-toggle.open span::before{ top:0; transform:rotate(45deg); }
+  .nav-toggle.open span::after{ top:0; transform:rotate(-45deg); }
+
+  .mobile-menu{
+    display:none;
+    position:fixed; top:74px; left:0; right:0; z-index:60;
+    background:rgba(6,9,18,0.97);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    padding:14px 22px 26px;
+    flex-direction:column; gap:4px;
+
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height .32s ease, opacity .25s ease;
+  }
+  .mobile-menu.open{ max-height:340px; opacity:1; }
+  .mobile-menu a{
+    padding:14px 6px; font-size:1rem; color:var(--text-hi);
+    border-bottom:1px solid var(--line);
+  }
+  .mobile-menu a:last-child{ border-bottom:none; }
+  .mobile-menu .nav-cta{ text-align:center; margin-top:12px; }
+
+  @media (max-width:800px){
+    .nav-links > a:not(.nav-cta){ display:none; }
+    .nav-links .nav-cta{ display:none; }
+    .nav-toggle{ display:flex; }
+    .mobile-menu{ display:flex; }
+  }
 
   /* ============ BUTTONS ============ */
   .btn{
@@ -364,7 +413,16 @@
       <a href="#nosotros">Nosotros</a>
       <a href="#contacto" class="nav-cta">Hablemos</a>
     </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span>
+    </button>
   </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#servicios">Servicios</a>
+    <a href="#proceso">Proceso</a>
+    <a href="#nosotros">Nosotros</a>
+    <a href="#contacto" class="nav-cta">Hablemos</a>
+  </div>
 </header>
 
 <main id="top">
@@ -646,6 +704,28 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Menú móvil: abrir/cerrar con el botón hamburguesa
+  const navToggle = document.getElementById('navToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (navToggle && mobileMenu){
+    navToggle.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      navToggle.classList.toggle('open', isOpen);
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      navToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+    });
+
+    // Cerrar el menú apenas tocan cualquier link de adentro
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        navToggle.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Abrir menú');
+      });
+    });
+  }
 
   // Scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
