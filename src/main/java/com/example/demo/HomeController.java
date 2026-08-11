@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class HomeController {
 
     private final EmailService emailService;
+    private final ContactRepository contactRepository;
 
-    public HomeController(EmailService emailService) {
+    public HomeController(EmailService emailService, ContactRepository contactRepository) {
         this.emailService = emailService;
+        this.contactRepository = contactRepository;
     }
 
     @GetMapping("/")
@@ -28,12 +30,25 @@ public class HomeController {
     public String recibirContacto(@RequestParam String nombre,
                                    @RequestParam String email,
                                    @RequestParam String mensaje) {
+
+        // 1) Guardamos el contacto en la base de datos PRIMERO.
+        // Esto es lo crítico: si falla, sí es un error real que el usuario debe ver.
         try {
-            emailService.enviarMensajeDeContacto(nombre, email, mensaje);
-            return "redirect:/?enviado=true#contacto";
+            Contact contacto = new Contact(nombre, email, mensaje);
+            contactRepository.save(contacto);
         } catch (Exception e) {
-            System.out.println("Error enviando correo: " + e.getMessage());
+            System.out.println("Error guardando el contacto en la base de datos: " + e.getMessage());
             return "redirect:/?error=true#contacto";
         }
+
+        // 2) Intentamos mandar el correo. Si esto falla, ya no es tan grave:
+        // el contacto ya quedó guardado y lo pueden ver en /h2-console.
+        try {
+            emailService.enviarMensajeDeContacto(nombre, email, mensaje);
+        } catch (Exception e) {
+            System.out.println("Contacto guardado, pero el correo falló: " + e.getMessage());
+        }
+
+        return "redirect:/?enviado=true#contacto";
     }
 }
