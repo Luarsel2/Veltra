@@ -70,6 +70,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Spring Boot 4 separó el H2 Console de la dependencia de h2:
+		     hace falta esta también para que /h2-console funcione. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-h2console</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
